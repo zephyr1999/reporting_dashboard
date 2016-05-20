@@ -3,7 +3,7 @@
 
   reportingApp.run(function($pouchDB) {
     $pouchDB.setDatabase("reportingAppTEST");
-    //$pouchDB.sync("http://localhost:4984/reportingAppTEST");
+    //$pouchDB.sync("http://Username:password@username.cloudant.com/report_dashboard_test");
   });
 
   reportingApp.config(function($stateProvider, $urlRouterProvider){
