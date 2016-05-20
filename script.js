@@ -77,18 +77,50 @@
     };
   });
 
-  reportingApp.controller("viewController", function($scope, $stateParams) {
-    //TODO retrieve database entry from stateParams id
-    $scope.id = $stateParams.id;
-    $scope.result = {name:"Erik",activity:"worked hard",date:"05/01/2016"};
+  reportingApp.controller("viewController", function($scope, $stateParams,$pouchDB) {
+    var init = function() {
+      $scope.id = $stateParams.id;
+      $scope.get($scope.id);
+    }
+    $scope.get = function(id) {
+      $pouchDB.getDoc(id)
+      .then(function(response) {
+        $scope.result = response;
+      })
+      .catch(function(err) {
+        $scope.result = {'Error' : 'None found'}
+      });
+    };
+    init();
   });
 
-  reportingApp.controller("resultsController", function($scope,$stateParams) {
-    //TODO link results to database
-    $scope.results = [{_id:1,name:"Erik",activity:"worked hard",date:"05/01/2016"},
-                      {_id:2,name:"Jueun",activity:"worked harder than erik",date:"05/02/2016"},
-                      {_id:3,name:"Atif",activity:"made interns work hard",date:"05/03/2016"}];
-    $scope.searchtext = $stateParams.searchtext;
+  reportingApp.controller("resultsController", function($scope,$stateParams,$pouchDB) {
+    $scope.getDocs = function(searchText) {
+      $pouchDB.allDocs()
+      .then(function (response) {
+        $scope.results = [];
+        for (var i = 0; i < response.rows.length; i++) {
+          for (var property in response.rows[i].doc) {
+            //console.log(property);
+            if (response.rows[i].doc[property].includes(searchText)) {
+              $scope.results.push(response.rows[i].doc);
+              break;
+            }
+          }
+
+        };
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+    }
+
+    var init = function() {
+      $scope.searchtext = $stateParams.searchtext;
+      $scope.results = {};
+      $scope.getDocs($scope.searchtext);
+    };
+    init();
   });
 
   reportingApp.controller("searchController", function($scope,$state) {
@@ -125,6 +157,7 @@
       this.database.put(
         doc
       ).then(function(response) {
+          console.log(response)
           deferred.resolve(response);
         })
         .catch(function(err) {
@@ -132,4 +165,29 @@
         });
       return deferred.promise;
     }
-  }]);
+
+    this.getDoc = function(id) {
+      var deferred = $q.defer();
+      this.database.get(id)
+      .then(function(response) {
+        deferred.resolve(response);
+      })
+      .catch(function(err) {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+    }
+
+    this.allDocs = function() {
+      var deferred = $q.defer();
+      this.database.allDocs({include_docs: true})
+      .then(function(response) {
+        deferred.resolve(response);
+      })
+      .catch(function(err) {
+        deferred.reject(err);
+      });
+      return deferred.promise;
+      }
+    }
+  ]);
