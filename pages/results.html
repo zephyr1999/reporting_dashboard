@@ -1,0 +1,14 @@
+<!--results.html-->
+<div class="jumbotron text-center">
+  <h2>Search Results</h3>
+</div>
+  <div class="list-group">
+    <ul >
+      <a ng-repeat="r in results" ui-sref="entryview({id:r._id})" class="list-group-item" >
+        <h4 class="list-group-item-heading">{{r.name}}: {{r.date}}</h4>
+        <p class="list-group-item-text">
+          {{r.activity}}
+        </p>
+      </a>
+    </ul>
+  </div>

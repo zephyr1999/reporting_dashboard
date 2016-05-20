@@ -1,0 +1,9 @@
+<div class="list-group">
+  <ul>
+    <li ng-repeat="(key,val) in result" class="list-group-item">
+      <p class="list-group-item-text">
+        <a ui-sref="results({searchtext:val})">{{key}} : {{val}}</a>
+      </p>
+    </li>
+  </ul>
+</div>
